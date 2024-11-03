@@ -1,0 +1,261 @@
+<?php
+include 'db.php';
+include 'auth.php';
+
+// Fetch stats for the dashboard
+$total_students = $conn->query("SELECT COUNT(*) AS count FROM students")->fetch_assoc()['count'];
+$total_present = 215000; // Replace with your logic
+$total_absent = 50; // Replace with your logic
+$total_late = 18; // Replace with your logic
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap5.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <img src="assets/imgs/logo.png" alt="SvM Logo" class="logo">
+            <div class="menu-icon" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+        <!-- Top Navbar -->
+        <nav class="navbar navbar-expand">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge bg-danger">3+</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+                        <li class="dropdown-header">Notifications</li>
+                        <li><a class="dropdown-item" href="notifications.php">Sample text</a></li>
+                        <li><a class="dropdown-item" href="notifications.php">Sample text has been deposited into your account!</a></li>
+                        <li><a class="dropdown-item" href="notifications.php">Sample text Unusually high spending detected!</a></li>
+                        <li><a class="dropdown-item text-center" href="notifications.php">Show All</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-envelope"></i>
+                        <span class="badge bg-warning">7</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="messagesDropdown">
+                        <li class="dropdown-header">Messages</li>
+                        <li><a class="dropdown-item" href="messages.php">
+                            <img src="assets/imgs/user.svg" alt="User" class="icon rounded-circle">
+                            <div>
+                                <div class="message-text">Hi there! I am wondering if you...</div>
+                                <div class="message-time">Emily Fowler · 58m</div>
+                            </div>
+                        </a></li>
+                        <li><a class="dropdown-item" href="messages.php">
+                            <img src="assets/imgs/user.svg" alt="User" class="icon rounded-circle">
+                            <div>
+                                <div class="message-text">I have the photos that you ordered...</div>
+                                <div class="message-time">Jae Chun · 1d</div>
+                            </div>
+                        </a></li>
+                        
+                        <li><a class="dropdown-item" href="messages.php">
+                            <img src="assets/imgs/user.svg" alt="User" class="icon rounded-circle">
+                            <div>
+                                <div class="message-text">Am I a good boy? The reason I as...</div>
+                                <div class="message-time">Chicken the Dog · 2w</div>
+                            </div>
+                        </a></li>
+                        <li><a class="dropdown-item text-center" href="messages.php">Read More Messages</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="username">Admin</span>
+                        <img class="img-profile rounded-circle" src="assets/imgs/user.svg" alt="User Avatar">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end user-dropdown" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user"></i> Profile</a></li>
+                        <li><a class="dropdown-item" href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="login.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    </ul>
+                </li>
+
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <nav class="nav flex-column">
+            <a class="nav-item active" href="index.php"><i class="fas fa-tachometer-alt"></i><span> Dashboard</span></a>
+            <a class="nav-item" href="students.php"><i class="fas fa-user-graduate"></i><span> Student Management</span></a>
+            <a class="nav-item" href="logs.php"><i class="fas fa-id-card"></i><span> RFID Logs</span></a>
+            <a class="nav-item" href="users.php"><i class="fas fa-users"></i><span> User Management</span></a>
+            <a class="nav-item" href="settings.php"><i class="fas fa-cogs"></i><span> Settings</span></a>
+            <a class="nav-item" href="report.php"><i class="fas fa-chart-line"></i><span> Report</span></a>
+            <a class="nav-item" href="login.php"><i class="fas fa-sign-out-alt"></i><span> Logout</span></a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="main-content">
+        <div class="container-fluid">
+            <!-- Page Heading -->
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+                <button class="btn btn-primary generate-report">Generate Report</button>
+            </div>
+
+            <!-- Content Row -->
+            <div class="row">
+                <!-- Total Student Card -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Student</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $total_students; ?></div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-users fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Present Card -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Present</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $total_present; ?></div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Absent Card -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Absent</div>
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col-auto">
+                                            <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800"><?php echo $total_absent; ?>%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Late Card -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Total Late</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $total_late; ?></div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logs Table -->
+            <div class="logs">
+                <h7>Logs Table</h7>
+                <div class="logs-container">
+                    
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped" id="dataTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Section</th>
+                                    <th>RFID No</th>
+                                    <th>Time In</th>
+                                    <th>Time Out</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Marcelino Villarin</td>
+                                    <td>Baltazar</td>
+                                    <td>6646564</td>
+                                    <td>7 am</td>
+                                    <td>7 am</td>
+                                    <td>12/2/2024</td>
+                                    <td class="status-late">Late</td>
+                                </tr>
+                                <tr>
+                                    <td>Thor Walton</td>
+                                    <td>Baltazar</td>
+                                    <td>543455333</td>
+                                    <td>7 am</td>
+                                    <td>7 am</td>
+                                    <td>12/2/2024</td>
+                                    <td class="status-early">Early</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        All Rights Reserved © 2024
+    </footer>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap5.min.js"></script>
+    <script src="script.js"></script>
+  
+</body>
+</html>
+without tooltip
